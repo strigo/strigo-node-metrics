@@ -17,15 +17,22 @@ jobs:
       - run: npm install
 
       - run:
+          name: Listen for metric emission
           command: nc -vv -ul -p 8125 > test.txt 2>&1
           background: true
 
       - run:
+          name: Run the metrics emitter
           command: node test/manual.js
           background: true
 
-      - run: sleep 10
-      - run: cat test.txt && if [ ! -s "test.txt" ]; then exit 1; fi
+      - run:
+          name: Wait for metrics output
+          command: sleep 10
+
+      - run:
+          name: Show output and assert it's not none
+          command: cat test.txt && if [ ! -s "test.txt" ]; then exit 1; fi
       - save_cache:
           paths:
             - node_modules
