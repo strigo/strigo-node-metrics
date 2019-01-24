@@ -40,10 +40,10 @@ jobs:
           name: Assert relevant metrics were emitted
           command: |
             # TODO: Check actual metric types and values
-            grep -Fxq "strigo_app_http_requests_total" $TEST_OUTPUT_FILE
-            grep -Fxq "strigo_app_my_gauge" $TEST_OUTPUT_FILE
-            grep -Fxq "strigo_app_my_histogram,tag=value" $TEST_OUTPUT_FILE
-            grep -Fxq "strigo_app_http_response_duration_ms" $TEST_OUTPUT_FILE
+            grep "strigo_app_http_requests_total" $TEST_OUTPUT_FILE
+            grep "strigo_app_my_gauge" $TEST_OUTPUT_FILE
+            grep "strigo_app_my_histogram,tag=value" $TEST_OUTPUT_FILE
+            grep "strigo_app_http_response_duration_ms" $TEST_OUTPUT_FILE
 
       - save_cache:
           paths:
