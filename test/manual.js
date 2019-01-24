@@ -2,7 +2,7 @@ const metrics = require('./../');
 
 // Initialize client for specific service (will add a statsd tag service=sam to each metric).
 // This returns an unabstracted node-statsd client.
-statsd = metrics.init('strigo-app');
+statsd = metrics.init('strigo_app');
 
 // Counter => (metricName, kvPairs (default = {}), increment (default = 1))
 metrics.increment('http_requests_total', {x: '1'}, 2);

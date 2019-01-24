@@ -4,6 +4,8 @@ jobs:
     docker:
       - image: circleci/node:10.9.0
     working_directory: ~/repo
+    environment:
+      - TEST_OUTPUT_FILE: test.metrics
     steps:
       - checkout
 
@@ -18,7 +20,7 @@ jobs:
 
       - run:
           name: Listen for metric emission
-          command: nc -vv -ul -p 8125 > test.txt 2>&1
+          command: nc -vv -ul -p 8125 > $TEST_OUTPUT_FILE 2>&1
           background: true
 
       - run:
@@ -32,7 +34,17 @@ jobs:
 
       - run:
           name: Show output and assert it's not none
-          command: cat test.txt && if [ ! -s "test.txt" ]; then exit 1; fi
+          command: cat $TEST_OUTPUT_FILE && if [ ! -s "$TEST_OUTPUT_FILE" ]; then exit 1; fi
+
+      - run:
+          name: Assert relevant metrics were emitted
+          command: |
+            # TODO: Check actual metric types and values
+            grep -Fxq "strigo_app_http_requests_total" $TEST_OUTPUT_FILE
+            grep -Fxq "strigo_app_my_gauge" $TEST_OUTPUT_FILE
+            grep -Fxq "strigo_app_my_histogram,tag=value" $TEST_OUTPUT_FILE
+            grep -Fxq "strigo_app_http_response_duration_ms" $TEST_OUTPUT_FILE
+
       - save_cache:
           paths:
             - node_modules
