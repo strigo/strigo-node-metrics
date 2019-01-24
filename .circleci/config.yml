@@ -16,11 +16,13 @@ jobs:
 
       - run: npm install
 
-      - run: nc -vv -ul -p 8125 > test.txt 2>&1
-        background: true
+      - run:
+          command: nc -vv -ul -p 8125 > test.txt 2>&1
+          background: true
 
-      - run: node test/manual.js
-        background: true
+      - run:
+          command: node test/manual.js
+          background: true
 
       - run: cat test.txt
       - save_cache:
