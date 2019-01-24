@@ -24,6 +24,7 @@ jobs:
           command: node test/manual.js
           background: true
 
+      - run: sleep 10
       - run: cat test.txt
       - save_cache:
           paths:
