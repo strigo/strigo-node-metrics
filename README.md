@@ -13,7 +13,7 @@ Add `"node-metrics": "strigo/node-metrics.git#TAG"` to your `package.json`.
 ## Usage
 
 ```javascript
-const metrics = require('node-metrics');
+import * as metrics from 'node-metrics;
 
 // Initialize client for specific service (will add a statsd tag service=sam to each metric).
 // This returns an unabstracted appmetrics-statsd client.
