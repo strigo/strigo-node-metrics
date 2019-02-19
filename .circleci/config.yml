@@ -9,6 +9,13 @@ jobs:
     steps:
       - checkout
 
+      - run:
+          name: Update package.json with latest tag
+          # Replace the moot version in package.json with the latest git tag.
+          # Note that we must preserve the > or circle will fail due to the colons being parsed as yaml.
+          command: >
+            sed -i "s|\"version\": \"0.0.0\"|\"version\": \"$(git describe --tags | cut -c 1- | awk -F \- '{print $1};')\"|g" package.json && cat package.json
+
       # Download and cache dependencies
       - restore_cache:
           keys:

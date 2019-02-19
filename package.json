@@ -1,6 +1,6 @@
 {
   "name": "strigo-node-metrics",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "private": true,
   "description": "A Strigo Abstraction for emitting statsd metrics",
   "scripts": {
