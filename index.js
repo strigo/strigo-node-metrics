@@ -1,32 +1,49 @@
-const client = require('./lib/statsd');
+/*
+ * Initialize a hot-shots client.
+ */
+const statsdClient = require('hot-shots');
 
-const isNotEmpty = (obj) => obj && Object.getOwnPropertyNames(obj).length;
+const STATSD_HOST = '127.0.0.1';
+const STATSD_PORT = 8125;
+const CONTAINER_HOSTNAME = process.env.HOSTNAME;
+const { NOMAD_ALLOC_ID } = process.env;
 
-function keyValuesToString(keyValues) {
-  return Object.keys(keyValues)
-    .reduce((r, k) => r.concat(`${k}=${keyValues[k]}`), [])
-    .join(',');
+function setupStatsdClient({
+  svc, env, host = STATSD_HOST, port = STATSD_PORT, log,
+}) {
+  if (!svc) {
+    throw new Error('Must provide a service name');
+  }
+
+  const globalTags = { env };
+
+  // If we don't add these conditionals, these tags will be set
+  // with an `undefined` value, which is wasteful.
+  if (CONTAINER_HOSTNAME) {
+    globalTags.container_hostname = CONTAINER_HOSTNAME;
+  }
+
+  if (NOMAD_ALLOC_ID) {
+    globalTags.nomad_alloc_id = NOMAD_ALLOC_ID;
+  }
+
+  if (log) {
+    log.info(`Initializing statsd client for service ${svc} @ ${STATSD_HOST}:${STATSD_PORT}...`);
+  }
+
+  const client = new statsdClient.StatsD(
+    {
+      host,
+      port,
+      prefix: `${svc}_`,
+      globalTags,
+      telegraf: true,
+    },
+  );
+
+  return client;
 }
 
 module.exports = {
-  init(serviceName) {
-    this.statsd = client(serviceName);
-    return this.statsd;
-  },
-
-  timing(metric, startTime, keyValues = {}) {
-    const latency = +new Date() - startTime;
-    const realMetric = isNotEmpty(keyValues) ? `${metric},${keyValuesToString(keyValues)}` : metric;
-    this.statsd.timing(realMetric, latency);
-  },
-
-  gauge(metric, gaugeValue, keyValues = {}) {
-    const realMetric = isNotEmpty(keyValues) ? `${metric},${keyValuesToString(keyValues)}` : metric;
-    this.statsd.gauge(realMetric, gaugeValue);
-  },
-
-  increment(metric, keyValues = {}, incrementValue = 1) {
-    const realMetric = isNotEmpty(keyValues) ? `${metric},${keyValuesToString(keyValues)}` : metric;
-    this.statsd.increment(realMetric, incrementValue);
-  },
+  setupStatsdClient,
 };
