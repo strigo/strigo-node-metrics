@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:12.5.0
+      - image: cimg/node:14.21
     working_directory: ~/repo
     environment:
       - TEST_OUTPUT_FILE: test.metrics
